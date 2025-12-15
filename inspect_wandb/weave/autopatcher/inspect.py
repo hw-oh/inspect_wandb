@@ -42,6 +42,7 @@ async def patched_task_run_sample(
     eval_set_id: str | None,
     run_id: str,
     task_id: str,
+    early_stopping: bool | None = None,
 ) -> dict[str, SampleScore] | None:
         patched_plan = PatchedPlan(plan.steps, plan.finish, plan.cleanup, plan.name, internal=True)
         
@@ -80,4 +81,5 @@ async def patched_task_run_sample(
             eval_set_id=eval_set_id,
             run_id=run_id,
             task_id=task_id,
+            early_stopping=early_stopping,
         )
