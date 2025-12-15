@@ -170,6 +170,12 @@ class WeaveEvaluationHooks(Hooks):
         # Use auto_summarize=True to let Weave compute aggregates from sample scores
         # This will populate the "Scores" section in Weave UI
         weave_eval_logger.log_summary({"inspect_metrics": inspect_metrics}, auto_summarize=True)
+        
+        # Print Weave evaluation URL at the end
+        if weave_eval_logger._evaluate_call is not None:
+            weave_url = weave_eval_logger._evaluate_call.ui_url
+            if weave_url:
+                print(f"\n🔗 Weave Eval: {weave_url}")
 
     @override
     async def on_sample_start(self, data: SampleStart) -> None:
