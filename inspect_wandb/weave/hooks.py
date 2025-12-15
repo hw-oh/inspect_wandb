@@ -156,16 +156,20 @@ class WeaveEvaluationHooks(Hooks):
         weave_eval_logger = self.weave_eval_loggers.get(data.eval_id)
         assert weave_eval_logger is not None
         
-        summary: dict = {}
+        # Build inspect_metrics from Inspect AI's aggregate results
+        # Use flattened keys (scorer_name/metric_name) for better Weave UI display
+        inspect_metrics: dict = {}
         if data.log and data.log.results:
             for score in data.log.results.scores:
                 scorer_name = score.name
                 if score.metrics:
-                    summary[scorer_name] = {}
                     for metric_name, metric in score.metrics.items():
-                        summary[scorer_name][metric_name] = metric.value
-            summary["sample_count"] = data.log.results.total_samples
-        weave_eval_logger.log_summary({"summary": summary}, auto_summarize=False)
+                        inspect_metrics[f"{scorer_name}/{metric_name}"] = metric.value
+            inspect_metrics["sample_count"] = data.log.results.total_samples
+        
+        # Use auto_summarize=True to let Weave compute aggregates from sample scores
+        # This will populate the "Scores" section in Weave UI
+        weave_eval_logger.log_summary({"inspect_metrics": inspect_metrics}, auto_summarize=True)
 
     @override
     async def on_sample_start(self, data: SampleStart) -> None:

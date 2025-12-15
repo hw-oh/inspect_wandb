@@ -6,14 +6,31 @@ from logging import getLogger
 utils_logger = getLogger(__name__)
 
 def format_score_types(score_value: Value, scorer_name: str | None = None) -> ScoreType:
-    if scorer_name in ["choice", "match"]:
+    # Scorers that return CORRECT/INCORRECT - convert to boolean for Weave aggregation
+    CORRECT_INCORRECT_SCORERS = [
+        # Built-in scorers
+        "choice", "match", "model_graded_qa",
+        # Custom scorers (extend this list as needed)
+        "hle_grader", "bfcl_scorer", "grid_match", 
+        "hallulens_qa_scorer", "hallulens_qa",
+        "kobbq_scorer", 
+        "refusal_scorer", "hallulens_refusal",
+        "swebench_server_scorer",
+    ]
+    if scorer_name in CORRECT_INCORRECT_SCORERS:
         if score_value == CORRECT:
             return True
         elif score_value == INCORRECT:
             return False
         else:
             utils_logger.warning(f"{scorer_name} is expected only to return values {CORRECT}, {INCORRECT}. Logging raw value to Weave.")
+    # Handle string scores that represent correct/incorrect
     if isinstance(score_value, str):
+        # Convert common score strings to boolean for proper aggregation
+        if score_value in ["C", CORRECT]:
+            return True
+        elif score_value in ["I", INCORRECT]:
+            return False
         return {"score": score_value}
     elif isinstance(score_value, int):
         return float(score_value)
