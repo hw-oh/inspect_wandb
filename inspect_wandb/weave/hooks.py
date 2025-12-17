@@ -296,11 +296,15 @@ class WeaveEvaluationHooks(Hooks):
 
         eval_metadata = data.spec.metadata or {}
         
-        inspect_data = {
-            "run_id": data.run_id,
-            "task_id": data.spec.task_id,
-            "eval_id": data.eval_id,
-        }
+        # By default, exclude run_id, task_id, eval_id to prevent Weave evaluation version changes
+        # These values change on every run and cause new versions to be created
+        inspect_data: dict[str, Any] = {}
+        if self.settings is not None and not self.settings.exclude_version_changing_metadata:
+            inspect_data = {
+                "run_id": data.run_id,
+                "task_id": data.spec.task_id,
+                "eval_id": data.eval_id,
+            }
 
         if log_dir is not None:
             eval_metadata["eval_set_log_dir"] = log_dir

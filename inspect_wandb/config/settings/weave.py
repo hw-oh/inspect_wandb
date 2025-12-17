@@ -15,3 +15,4 @@ class WeaveSettings(InspectWandBBaseSettings):
     )
 
     sample_name_template: str = Field(default="{task_name}-sample-{sample_id}-epoch-{epoch}", description="Template for sample display names. Available variables: {task_name}, {sample_id}, {epoch}")
+    exclude_version_changing_metadata: bool = Field(default=True, description="Exclude run_id, task_id, eval_id from eval metadata to prevent Weave evaluation version changes on each run")
