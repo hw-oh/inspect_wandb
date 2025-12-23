@@ -16,6 +16,7 @@ from weave.trace.autopatch import IntegrationSettings, OpSettings
 from weave import integrations
 import importlib.util
 from gql.transport.exceptions import TransportQueryError
+import os
 
 logger = getLogger(__name__)
 
@@ -124,7 +125,9 @@ class WeaveEvaluationHooks(Hooks):
             self._weave_initialized = True
             logger.info(f"Weave initialized for task {data.spec.task}")
         
-        model_name = format_model_name(data.spec.model) 
+        # Use INSPECT_WANDB_MODEL_NAME env var if set, otherwise use formatted model name
+        model_name = os.environ.get("INSPECT_WANDB_MODEL_NAME") or format_model_name(data.spec.model)
+        model_name = format_model_name(model_name)  # Ensure proper formatting for Weave ID
         weave_eval_logger = EvaluationLogger(
             name=data.spec.task,
             dataset=data.spec.dataset.name or "test_dataset",
