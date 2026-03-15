@@ -1,5 +1,3 @@
-
-
 from typing import Self
 from inspect_wandb.config.settings.base import InspectWandBBaseSettings
 from pydantic import Field, model_validator
@@ -15,6 +13,7 @@ class WeaveSettings(InspectWandBBaseSettings):
         pyproject_toml_table_header=("tool", "inspect-wandb", "weave"),
     )
 
+    eval_traces_only: bool = Field(default=False, description="When True, only eval-level summary logging is performed and sample-level Weave traces are disabled.")
     sample_name_template: str = Field(default="{task_name}-sample-{sample_id}-epoch-{epoch}", description="Template for sample display names. Available variables: {task_name}, {sample_id}, {epoch}")
     exclude_version_changing_metadata: bool = Field(default=True, description="Exclude run_id, task_id, eval_id from eval metadata to prevent Weave evaluation version changes on each run")
 
