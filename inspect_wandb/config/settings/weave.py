@@ -1,7 +1,8 @@
 
 
+from typing import Self
 from inspect_wandb.config.settings.base import InspectWandBBaseSettings
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import SettingsConfigDict
 
 class WeaveSettings(InspectWandBBaseSettings):
@@ -10,9 +11,14 @@ class WeaveSettings(InspectWandBBaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_prefix="INSPECT_WANDB_WEAVE_", 
+        env_prefix="INSPECT_WANDB_WEAVE_",
         pyproject_toml_table_header=("tool", "inspect-wandb", "weave"),
     )
 
     sample_name_template: str = Field(default="{task_name}-sample-{sample_id}-epoch-{epoch}", description="Template for sample display names. Available variables: {task_name}, {sample_id}, {epoch}")
     exclude_version_changing_metadata: bool = Field(default=True, description="Exclude run_id, task_id, eval_id from eval metadata to prevent Weave evaluation version changes on each run")
+
+    @model_validator(mode="after")
+    def force_enabled(self) -> Self:
+        self.enabled = True
+        return self

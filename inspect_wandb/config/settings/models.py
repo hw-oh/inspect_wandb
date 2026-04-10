@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, field_validator
+from typing import Self
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Any
 from pydantic_settings import SettingsConfigDict
 from inspect_wandb.config.settings.base import InspectWandBBaseSettings
@@ -18,7 +19,7 @@ class ModelsSettings(InspectWandBBaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_prefix="INSPECT_WANDB_MODELS_", 
+        env_prefix="INSPECT_WANDB_MODELS_",
         pyproject_toml_table_header=("tool", "inspect-wandb", "models"),
     )
 
@@ -41,3 +42,8 @@ class ModelsSettings(InspectWandBBaseSettings):
                 cls.enabled = False
                 raise ValueError(f"WANDB_API_KEY does not match the value in the environment. Validation Key: {v.wandb_api_key}, Environment Key: {env_wandb_api_key}")
         return v
+
+    @model_validator(mode="after")
+    def force_disabled(self) -> Self:
+        self.enabled = False
+        return self
